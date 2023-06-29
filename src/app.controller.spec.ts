@@ -15,8 +15,11 @@ describe('AppController', () => {
   })
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!')
+    it('should return Health Route object', () => {
+      expect(appController.getHealth()).toStrictEqual({
+        timestamp: expect.any(Date),
+        package_version: expect.any(String),
+      })
     })
   })
 })
