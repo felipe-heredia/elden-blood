@@ -16,8 +16,9 @@ model User {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  name  String?
-  email String  @unique
+  name String?
+
+  purchases Purchase[]
 
   @@map("user")
 }
@@ -44,9 +45,11 @@ model Purchase {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  storeId String @db.Uuid
+  userId  String  @db.Uuid
+  storeId String? @db.Uuid
 
-  store Store @relation(fields: [storeId], references: [id])
+  User  User   @relation(fields: [userId], references: [id])
+  store Store? @relation(fields: [storeId], references: [id])
 
   @@map("purchase")
 }
