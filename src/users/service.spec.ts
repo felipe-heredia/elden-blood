@@ -6,6 +6,7 @@ import { PrismaModule } from '@/prisma/module'
 import { PrismaService } from '@/prisma/service'
 
 const JohnDoe = { name: 'John Doe' }
+const deletedJohnDoe = { name: 'John Doe', deletedAt: new Date() }
 
 const users = [{ ...JohnDoe }, { name: 'Geralt of Rivia' }, { name: 'Yennefer' }]
 
@@ -14,6 +15,8 @@ const db = {
     findMany: jest.fn().mockReturnValue(users),
     findUnique: jest.fn().mockReturnValue(JohnDoe),
     create: jest.fn().mockReturnValue(JohnDoe),
+    update: jest.fn().mockReturnValue({ name: 'John Doe Geralt' }),
+    delete: jest.fn().mockReturnValue(deletedJohnDoe),
   },
 }
 
@@ -53,10 +56,24 @@ describe('UsersService', () => {
     })
   })
 
-  describe('find one users', () => {
+  describe('find one user', () => {
     it('should find one users by id', async () => {
       const user = await service.findOne('a mock uuid')
       expect(user).toEqual(JohnDoe)
+    })
+  })
+
+  describe('update user', () => {
+    it('should update user', async () => {
+      const user = await service.update('a mock uuid', { name: 'John Doe Geralt' })
+      expect(user).toEqual({ name: 'John Doe Geralt' })
+    })
+  })
+
+  describe('remote user', () => {
+    it('should soft delete a user', async () => {
+      const user = await service.remove('a mock uuid')
+      expect(user).toEqual(deletedJohnDoe)
     })
   })
 })
