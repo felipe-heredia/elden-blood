@@ -28,6 +28,19 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
       })
     }
 
+    if (params.action === 'findMany') {
+      return next({
+        ...params,
+        action: 'findMany',
+        args: {
+          ...params.args,
+          where: {
+            deletedAt: null,
+          },
+        },
+      })
+    }
+
     return next(params)
   }
 }
