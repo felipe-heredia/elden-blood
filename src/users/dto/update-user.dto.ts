@@ -1,3 +1,7 @@
-import { CreateUserDto } from './create-user.dto'
+import { IsOptional, IsString } from 'class-validator'
 
-export class UpdateUserDto extends CreateUserDto {}
+export class UpdateUserDto {
+  @IsString()
+  @IsOptional()
+  name?: string
+}
