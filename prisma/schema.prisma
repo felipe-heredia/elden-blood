@@ -51,6 +51,8 @@ model Purchase {
   User  User   @relation(fields: [userId], references: [id])
   store Store? @relation(fields: [storeId], references: [id])
 
+  PurchaseCondition PurchaseCondition[]
+
   @@map("purchase")
 }
 
@@ -78,10 +80,12 @@ model PurchaseCondition {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  price     Decimal @db.Money
-  productId String  @db.Uuid
+  price      Decimal @db.Money
+  purchaseId String  @db.Uuid
+  productId  String  @db.Uuid
 
-  product Product @relation(fields: [productId], references: [id])
+  product  Product  @relation(fields: [productId], references: [id])
+  purchase Purchase @relation(fields: [purchaseId], references: [id])
 
   @@map("purchase_condition")
 }
