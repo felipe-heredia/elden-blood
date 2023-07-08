@@ -56,6 +56,19 @@ model Purchase {
   @@map("purchase")
 }
 
+model Brand {
+  id        String    @id @default(uuid()) @db.Uuid
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  name String
+
+  products Product[]
+
+  @@map("brand")
+}
+
 model Product {
   id        String    @id @default(uuid()) @db.Uuid
   createdAt DateTime  @default(now())
@@ -63,14 +76,12 @@ model Product {
   deletedAt DateTime?
 
   name    String
-  brand   String
   brandId String @db.Uuid
 
-  Brand Brand @relation(fields: [brandId], references: [id])
-
+  brand              Brand               @relation(fields: [brandId], references: [id])
   purchaseConditions PurchaseCondition[]
 
-  @@unique([name, brand])
+  @@unique([name, brandId])
   @@map("product")
 }
 
@@ -88,17 +99,4 @@ model PurchaseCondition {
   purchase Purchase @relation(fields: [purchaseId], references: [id])
 
   @@map("purchase_condition")
-}
-
-model Brand {
-  id        String    @id @default(uuid()) @db.Uuid
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-
-  name String
-
-  products Product[]
-
-  @@map("brand")
 }
