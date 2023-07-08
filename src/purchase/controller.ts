@@ -10,7 +10,7 @@ export class PurchaseController {
 
   @Post()
   create(@Body() createPurchase: CreatePurchaseDto) {
-    return this.purchaseService.create(createPurchase)
+    // return this.purchaseService.create(createPurchase)
   }
 
   @Get()
@@ -25,7 +25,7 @@ export class PurchaseController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePurchase: UpdatePurchaseDto) {
-    return this.purchaseService.update(id, updatePurchase)
+    // return this.purchaseService.update(id, updatePurchase)
   }
 
   @Delete(':id')
