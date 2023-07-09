@@ -4,23 +4,35 @@ import { PurchaseService } from './service'
 
 import { PrismaModule } from '@/prisma/module'
 import { PrismaService } from '@/prisma/service'
+import { UsersService } from '@/users/service'
+import { StoreService } from '@/store/service'
 
-const JohnDoe = { name: 'John Doe' }
-const deletedJohnDoe = { name: 'John Doe', deletedAt: new Date() }
+const purchaseData = { userId: 'user-mocked-uuid', storeId: 'store-mocked-uuid' }
 
-const users = [{ ...JohnDoe }, { name: 'Geralt of Rivia' }, { name: 'Yennefer' }]
+const deletedPurchaseData = { ...purchaseData, deletedAt: new Date() }
 
 const db = {
-  user: {
-    findMany: jest.fn().mockReturnValue(users),
-    findUnique: jest.fn().mockReturnValue(JohnDoe),
-    create: jest.fn().mockReturnValue(JohnDoe),
-    update: jest.fn().mockReturnValue({ name: 'John Doe Geralt' }),
-    delete: jest.fn().mockReturnValue(deletedJohnDoe),
+  purchase: {
+    findUnique: jest.fn().mockReturnValue(purchaseData),
+    create: jest.fn().mockReturnValue(purchaseData),
+    update: jest.fn().mockReturnValue({ ...purchaseData, storeId: 'store-uuid-mocked' }),
+    delete: jest.fn().mockReturnValue(deletedPurchaseData),
   },
 }
 
-describe('UsersService', () => {
+const user = {
+  findOne: jest.fn().mockReturnValue({ name: 'John Doe' }),
+}
+const store = {
+  findOne: jest.fn().mockReturnValue({
+    name: 'Andorinha',
+    city: 'São Paulo',
+    state: 'SP',
+    country: 'Brasil',
+  }),
+}
+
+describe('PurchaseService', () => {
   let service: PurchaseService
 
   beforeEach(async () => {
@@ -28,10 +40,9 @@ describe('UsersService', () => {
       imports: [PrismaModule],
       providers: [
         PurchaseService,
-        {
-          provide: PrismaService,
-          useValue: db,
-        },
+        { provide: PrismaService, useValue: db },
+        { provide: UsersService, useValue: user },
+        { provide: StoreService, useValue: store },
       ],
     }).compile()
 
@@ -42,38 +53,34 @@ describe('UsersService', () => {
     expect(service).toBeDefined()
   })
 
-  describe('create user', () => {
-    it('should successfully insert a user', async () => {
-      const user = await service.create(JohnDoe)
-      expect(user).toEqual(JohnDoe)
+  describe('create purchase', () => {
+    it('should successfully insert a purchase', async () => {
+      const purchase = await service.create(purchaseData)
+      expect(purchase).toEqual(purchaseData)
     })
   })
 
-  describe('find many', () => {
-    it('should return an array of users', async () => {
-      const manyUsers = await service.findAll()
-      expect(manyUsers).toEqual(manyUsers)
+  describe('find one purchase', () => {
+    it('should find one purchases by id', async () => {
+      const purchase = await service.findOne('a mock uuid')
+      expect(purchase).toEqual(purchaseData)
     })
   })
 
-  describe('find one user', () => {
-    it('should find one users by id', async () => {
-      const user = await service.findOne('a mock uuid')
-      expect(user).toEqual(JohnDoe)
+  describe('update purchase', () => {
+    it('should update purchase', async () => {
+      const purchase = await service.update('a mock uuid', {
+        ...purchaseData,
+        storeId: 'store-uuid-mocked',
+      })
+      expect(purchase).toEqual({ ...purchaseData, storeId: 'store-uuid-mocked' })
     })
   })
 
-  describe('update user', () => {
-    it('should update user', async () => {
-      const user = await service.update('a mock uuid', { name: 'John Doe Geralt' })
-      expect(user).toEqual({ name: 'John Doe Geralt' })
-    })
-  })
-
-  describe('remote user', () => {
-    it('should soft delete a user', async () => {
-      const user = await service.remove('a mock uuid')
-      expect(user).toEqual(deletedJohnDoe)
+  describe('remote purchase', () => {
+    it('should soft delete a purchase', async () => {
+      const purchase = await service.remove('a mock uuid')
+      expect(purchase).toEqual(deletedPurchaseData)
     })
   })
 })

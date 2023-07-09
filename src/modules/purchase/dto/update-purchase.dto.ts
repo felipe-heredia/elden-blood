@@ -1,7 +1,11 @@
-import { IsOptional, IsString } from 'class-validator'
+import { IsOptional, IsUUID } from 'class-validator'
 
 export class UpdatePurchaseDto {
-  @IsString()
   @IsOptional()
-  name?: string
+  @IsUUID('4', { message: 'Por favor informe um usuário válido' })
+  userId?: string
+
+  @IsOptional()
+  @IsUUID('4', { message: 'Por favor informe uma loja válida' })
+  storeId?: string
 }

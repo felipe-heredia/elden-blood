@@ -1,26 +1,56 @@
-import { Injectable } from '@nestjs/common'
-import { Prisma } from '@prisma/client'
+import { Injectable, NotFoundException } from '@nestjs/common'
+
+import { CreatePurchaseDto } from './dto/create-purchase.dto'
+import { UpdatePurchaseDto } from './dto/update-purchase.dto'
 
 import { PrismaService } from '@/prisma/service'
+import { StoreService } from '@/store/service'
+import { UsersService } from '@/users/service'
 
 @Injectable()
 export class PurchaseService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly userService: UsersService,
+    private readonly storeService: StoreService
+  ) {}
 
-  create(createPurchase: Prisma.PurchaseCreateInput) {
-    return this.prisma.purchase.create({ data: createPurchase })
-  }
+  async create({ userId, storeId }: CreatePurchaseDto) {
+    const user = await this.userService.findOne(userId)
 
-  findAll() {
-    return this.prisma.purchase.findMany()
+    if (!user) throw new NotFoundException('Usuário não encontrado!')
+
+    const store = await this.storeService.findOne(storeId)
+
+    if (!store) throw new NotFoundException('Loja não encontrada!')
+
+    return await this.prisma.purchase.create({
+      data: { userId, storeId },
+    })
   }
 
   findOne(id: string) {
     return this.prisma.purchase.findUnique({ where: { id } })
   }
 
-  update(id: string, purchase: Prisma.PurchaseUpdateInput) {
-    return this.prisma.purchase.update({ where: { id }, data: purchase })
+  async update(id: string, { userId, storeId }: UpdatePurchaseDto) {
+    if (userId) {
+      const user = await this.userService.findOne(userId)
+      if (!user) throw new NotFoundException('Usuário não encontrado!')
+    }
+
+    if (storeId) {
+      const store = await this.storeService.findOne(storeId)
+      if (!store) throw new NotFoundException('Loja não encontrada!')
+    }
+
+    return await this.prisma.purchase.update({
+      where: { id },
+      data: {
+        storeId: storeId || undefined,
+        userId: userId || undefined,
+      },
+    })
   }
 
   remove(id: string) {

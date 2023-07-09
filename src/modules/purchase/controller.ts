@@ -4,18 +4,13 @@ import { CreatePurchaseDto } from './dto/create-purchase.dto'
 import { UpdatePurchaseDto } from './dto/update-purchase.dto'
 import { PurchaseService } from './service'
 
-@Controller('users')
+@Controller('purchase')
 export class PurchaseController {
   constructor(private readonly purchaseService: PurchaseService) {}
 
   @Post()
   create(@Body() createPurchase: CreatePurchaseDto) {
-    // return this.purchaseService.create(createPurchase)
-  }
-
-  @Get()
-  findAll() {
-    return this.purchaseService.findAll()
+    return this.purchaseService.create(createPurchase)
   }
 
   @Get(':id')
@@ -25,7 +20,7 @@ export class PurchaseController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePurchase: UpdatePurchaseDto) {
-    // return this.purchaseService.update(id, updatePurchase)
+    return this.purchaseService.update(id, updatePurchase)
   }
 
   @Delete(':id')
