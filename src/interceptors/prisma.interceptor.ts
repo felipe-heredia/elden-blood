@@ -11,7 +11,7 @@ import { catchError } from 'rxjs/operators'
 
 @Injectable()
 export class PrismaInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(_: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       catchError(error => {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -26,9 +26,11 @@ export class PrismaInterceptor implements NestInterceptor {
               message: errorMessage,
             })
           }
+        } else if (error instanceof Prisma.PrismaClientValidationError) {
+          throw new BadRequestException(error.message)
         }
 
-        throw new BadRequestException(error)
+        throw error
       })
     )
   }
