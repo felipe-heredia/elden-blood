@@ -30,7 +30,10 @@ export class PurchaseService {
   }
 
   findOne(id: string) {
-    return this.prisma.purchase.findUnique({ where: { id } })
+    return this.prisma.purchase.findUnique({
+      where: { id },
+      include: { purchaseConditions: true },
+    })
   }
 
   async update(id: string, { userId, storeId }: UpdatePurchaseDto) {
